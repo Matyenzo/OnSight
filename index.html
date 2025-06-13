@@ -133,3 +133,117 @@
   </script>
 </body>
 </html>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Datos de Envío</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      background: #111;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    input, textarea {
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px;
+      background: #fff;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #order-summary {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 20px auto;
+      max-width: 500px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Finalizar compra</h1>
+  <div id="order-summary"></div>
+  <form 
+    id="shipping-form"
+    action="https://formspree.io/f/mvgraelo" 
+    method="POST"
+  >
+    <input type="text" name="nombre" placeholder="Nombre completo" required />
+    <input type="email" name="email" placeholder="Correo electrónico" required />
+    <input type="text" name="dni" placeholder="DNI" required />
+    <textarea name="direccion" placeholder="Dirección de envío" required></textarea>
+
+    <input type="hidden" name="pedido" id="pedido-hidden">
+    <input type="hidden" name="carrito" id="carrito-hidden">
+    <input type="hidden" name="total" id="total-hidden">
+
+    <button type="submit">Confirmar pedido</button>
+  </form>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const pedido = params.get('pedido') || 'N/A';
+    let items = [];
+    try {
+      const rawItems = params.get('items');
+      if (rawItems) {
+        items = JSON.parse(decodeURIComponent(rawItems));
+      }
+    } catch (e) {
+      console.error('Error al parsear items:', e);
+    }
+    const total = params.get('total') || '0';
+
+    const resumen = document.getElementById('order-summary');
+    if (resumen && Array.isArray(items)) {
+      resumen.innerHTML = `
+        <h2>Pedido N° ${pedido}</h2>
+        <ul>
+          ${items.map(item => `<li>${item.name} - $${item.price}</li>`).join('')}
+        </ul>
+        <p><strong>Total:</strong> $${total}</p>
+      `;
+    }
+
+    const pedidoInput = document.getElementById('pedido-hidden');
+    const carritoInput = document.getElementById('carrito-hidden');
+    const totalInput = document.getElementById('total-hidden');
+
+    if (pedidoInput) pedidoInput.value = pedido;
+    if (carritoInput) carritoInput.value = Array.isArray(items) ? items.map(item => `${item.name} - $${item.price}`).join(', ') : '';
+    if (totalInput) totalInput.value = total;
+  </script>
+</body>
+</html>
+<form 
+  id="shipping-form"
+  action="https://formspree.io/f/mvgraelo" 
+  method="POST"
+>
